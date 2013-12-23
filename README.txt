@@ -2,7 +2,7 @@ Requirements
 You need Java 1.6 or higher installed. You can check this by opening a command prompt and typing "java -version".
 
 Quickstart
-1. Download the zip file, and unzip everything into a single directory. https://github.com/Jazzepi/CommissionChecker/blob/master/CommissionChecker.zip
+1. Download the zip file, and unzip everything into a single directory. https://github.com/Jazzepi/CommissionChecker/raw/master/CommissionChecker.zip
 2. Configure the checker.properties file with authentication information and what artists you're interested in watching. The checker uses the email information to send you an email notification when it finds a new commission open. You can edit this file with any simple text editor. Notepad will do. Do not use something like Microsoft Word. Set the any sites you want to be checked for commissions to "true".
 3. Run the jar by double clicking on it.
 

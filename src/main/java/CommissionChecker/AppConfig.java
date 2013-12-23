@@ -49,9 +49,9 @@ public class AppConfig {
 
     @Bean(name="commissionKeywords")
     List<String> commissionKeywords(@Qualifier("checkerProperties") Properties properties) {
-        ArrayList<String> furaffinityUsernames = new ArrayList<String>();
-        Collections.addAll(furaffinityUsernames, properties.getProperty("commissionKeywords", "").split(","));
-        return furaffinityUsernames;
+        ArrayList<String> commissionKeywords = new ArrayList<String>();
+        Collections.addAll(commissionKeywords, properties.getProperty("commissionKeywords", "").split(","));
+        return commissionKeywords;
     }
 
     @Bean(name="emptyJournalArraylist")

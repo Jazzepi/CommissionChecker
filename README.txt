@@ -2,7 +2,7 @@ Requirements
 You need Java 1.6 or higher installed. You can check this by opening a command prompt and typing "java -version".
 
 Quickstart
-1. Download the zip file, and unzip everything into a single directory.
+1. Download the zip file, and unzip everything into a single directory. https://github.com/Jazzepi/CommissionChecker/blob/master/CommissionChecker.zip
 2. Configure the checker.properties file with authentication information and what artists you're interested in watching. The checker uses the email information to send you an email notification when it finds a new commission open. You can edit this file with any simple text editor. Notepad will do. Do not use something like Microsoft Word. Set the any sites you want to be checked for commissions to "true".
 3. Run the jar by double clicking on it.
 
@@ -25,7 +25,7 @@ Do
 Don't
 *Add another mocking framework
 *Submit a pull request without proper unit test coverage
-*Submit a pull request that add XML bean configuration
+*Submit a pull request that adds XML bean configuration
 *Write to Java 1.7 or higher
 
 To add the capacity for watching a new site for commissions do the following.

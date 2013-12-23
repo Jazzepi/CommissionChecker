@@ -50,7 +50,7 @@ public class AppConfig {
     @Bean(name="commissionKeywords")
     List<String> commissionKeywords(@Qualifier("checkerProperties") Properties properties) {
         ArrayList<String> commissionKeywords = new ArrayList<String>();
-        Collections.addAll(commissionKeywords, properties.getProperty("commissionKeywords", "").split(","));
+        Collections.addAll(commissionKeywords, properties.getProperty("commissionKeywords", "").toLowerCase().split(","));
         return commissionKeywords;
     }
 

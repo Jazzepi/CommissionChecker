@@ -27,7 +27,7 @@ public class Checker {
         }
         for(JournalEntry element: commissionWebsite.fetchJournalEntries()) {
             log.info("Checking " + element.getUsername() + "'s journal " +  element.getJournalName() + " for commissions");
-            if(commissionWebsite.isWatchedUser(element.getUsername()) && isCommissionJournalTitle(element.getJournalName())) {
+            if(commissionWebsite.isWatchedUser(element.getUsername()) && isCommissionJournalTitle(element.getJournalName().toLowerCase())) {
                 if(isAnUnreportedOffer(element)) {
                     log.info("Found new commission offer in this journal" + element);
                     foundCommissionOffers.add(element);
@@ -45,7 +45,7 @@ public class Checker {
     private boolean isCommissionJournalTitle(String candidate) {
         boolean returnValue = false;
         for(String element: commissionKeywords) {
-            if(candidate.toLowerCase().contains(element)) {
+            if(candidate.contains(element)) {
                 returnValue = true;
                 break;
             }

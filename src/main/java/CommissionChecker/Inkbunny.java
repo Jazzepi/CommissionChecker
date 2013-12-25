@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -28,8 +29,7 @@ public class Inkbunny extends CommissionWebsite {
     private String password;
     @Resource(name = "inkbunnyUserList")
     private List<String> watchedUsernames;
-    @Resource(name = "emptyStringToStringMap")
-    private Map<String, String> cookies;
+    private Map<String, String> cookies = new HashMap<String, String>();
     @Logger
     private Log log;
 

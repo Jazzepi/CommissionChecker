@@ -4,32 +4,31 @@ import CommissionChecker.logger.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.URL;
 
 @Component
 public class DisplayManager implements StateListener {
 
     private SystemTray systemTray;
-    private TrayIcon trayIcon;
-    Image workingImage;
+    private final TrayIcon trayIcon;
+    Image runningImage;
     Image idleImage;
     @Logger
     private Log log;
 
     @Autowired
-    DisplayManager(Runner runner) throws IOException, AWTException {
+    DisplayManager(Runner runner, @Qualifier("runningImage") Image runningImage, @Qualifier("sleepingImage") Image idleImage, TrayIcon trayIcon) throws IOException, AWTException {
+        this.runningImage = runningImage;
+        this.idleImage = idleImage;
+        this.trayIcon = trayIcon;
+
         if(SystemTray.isSupported()) {
-            int trayIconWidth = new TrayIcon(ImageIO.read(getClass().getResource("/working.png"))).getSize().width;
-            workingImage = getScaledImage(getClass().getResource("/working.png"), trayIconWidth);
-            idleImage = getScaledImage(getClass().getResource("/idle.png"), trayIconWidth);
-            trayIcon = new TrayIcon(workingImage);
             systemTray = SystemTray.getSystemTray();
             systemTray.add(trayIcon);
             PopupMenu popupMenu = new PopupMenu();
@@ -38,7 +37,7 @@ public class DisplayManager implements StateListener {
             trayIcon.setPopupMenu(popupMenu);
             exitItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    systemTray.remove(trayIcon);
+                    systemTray.remove(DisplayManager.this.trayIcon);
                     LogManager.shutdown();
                     System.exit(0);
                 }
@@ -47,15 +46,11 @@ public class DisplayManager implements StateListener {
         }
     }
 
-    private Image getScaledImage(URL image_location, int width) throws IOException {
-        return ImageIO.read(image_location).getScaledInstance(width, -1, Image.SCALE_SMOOTH);
-    }
-
     @Override
     public void stateChange(ApplicationState newState) {
         switch (newState) {
             case RUNNING:
-                trayIcon.setImage(workingImage);
+                trayIcon.setImage(runningImage);
                 break;
             case SLEEPING:
                 trayIcon.setImage(idleImage);

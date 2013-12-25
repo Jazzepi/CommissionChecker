@@ -56,12 +56,25 @@
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
         </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
         <mvn.spring.version>3.2.5.RELEASE</mvn.spring.version>
         <mvn.project.build.sourceEncoding>UTF-8</mvn.project.build.sourceEncoding>
         <mvn.main.class>CommissionChecker.Main</mvn.main.class>
+        <powermock.version>1.5.2</powermock.version>
     </properties>
 
     <build>

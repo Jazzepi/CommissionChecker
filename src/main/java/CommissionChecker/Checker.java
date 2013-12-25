@@ -12,11 +12,9 @@ import java.util.List;
 @Component
 public class Checker {
 
-    @Resource(name = "emptyJournalArraylist")
-    private List<JournalEntry> foundCommissionOffers;
+    private List<JournalEntry> foundCommissionOffers = new ArrayList<JournalEntry>();
     @Resource(name = "commissionKeywords")
     private List<String> commissionKeywords;
-
     @Logger private Log log;
 
     public ArrayList<JournalEntry> check(CommissionWebsite commissionWebsite) throws IOException {

@@ -9,19 +9,25 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 @Configuration
 @ComponentScan(basePackageClasses = AppConfig.class)
 public class AppConfig {
 
+    private int systemTrayIconWidth = -1;
+
     @Logger
     Log log;
 
-    @Bean(name="checkerProperties")
-        Properties loadProperties() throws IOException {
+    @Bean(name = "checkerProperties")
+    Properties loadProperties() throws IOException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(checkerPropertiesFilename()));
         return properties;
@@ -32,32 +38,26 @@ public class AppConfig {
         return developmentCheckerPropertiesFileName != null ? developmentCheckerPropertiesFileName : "checker.properties";
     }
 
-    @Bean(name="activeCommissionWebsites")
+    @Bean(name = "activeCommissionWebsites")
     List<CommissionWebsite> activeCommissionWebsites(@Qualifier("checkerProperties") Properties properties, Inkbunny inkbunny, Furaffinity furaffinity) {
         ArrayList<CommissionWebsite> commissionWebsites = new ArrayList<CommissionWebsite>();
-        if(properties.getProperty("site.inkbunny.isActive", "false").equals("true")) {
+        if (properties.getProperty("site.inkbunny.isActive", "false").equals("true")) {
             commissionWebsites.add(inkbunny);
         }
-        if(properties.getProperty("site.furaffinity.isActive", "false").equals("true")) {
+        if (properties.getProperty("site.furaffinity.isActive", "false").equals("true")) {
             commissionWebsites.add(furaffinity);
         }
-        if(commissionWebsites.size() == 0) {
+        if (commissionWebsites.size() == 0) {
             log.error("No websites are enabled for commission checker. It has no work to do.");
         }
         return commissionWebsites;
     }
 
-    @Bean(name="commissionKeywords")
+    @Bean(name = "commissionKeywords")
     List<String> commissionKeywords(@Qualifier("checkerProperties") Properties properties) {
         ArrayList<String> commissionKeywords = new ArrayList<String>();
         Collections.addAll(commissionKeywords, properties.getProperty("commissionKeywords", "").toLowerCase().split(","));
         return commissionKeywords;
-    }
-
-    @Bean(name="emptyJournalArraylist")
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    List<JournalEntry> emptyJournalEntriesArraylist() {
-        return new ArrayList<JournalEntry>();
     }
 
     @Bean
@@ -66,7 +66,7 @@ public class AppConfig {
         return new ArrayList<String>();
     }
 
-    @Bean(name="furaffinityUserList")
+    @Bean(name = "furaffinityUserList")
     List<String> furaffinityUserList(@Qualifier("checkerProperties") Properties properties) {
         ArrayList<String> furaffinityUsernames = new ArrayList<String>();
         for (String element : properties.getProperty("site.furaffinity.watchedUsernames", "").split(",")) {
@@ -75,17 +75,17 @@ public class AppConfig {
         return furaffinityUsernames;
     }
 
-    @Bean(name="furaffinityUsername")
+    @Bean(name = "furaffinityUsername")
     String furaffinityUsername(@Qualifier("checkerProperties") Properties properties) {
-        return properties.getProperty("site.furaffinity.username","");
+        return properties.getProperty("site.furaffinity.username", "");
     }
 
-    @Bean(name="furaffinityPassword")
+    @Bean(name = "furaffinityPassword")
     String furaffinityPassword(@Qualifier("checkerProperties") Properties properties) {
-        return properties.getProperty("site.furaffinity.password","");
+        return properties.getProperty("site.furaffinity.password", "");
     }
 
-    @Bean(name="inkbunnyUserList")
+    @Bean(name = "inkbunnyUserList")
     List<String> inkbunnyUserList(@Qualifier("checkerProperties") Properties properties) {
         ArrayList<String> inkbunnyUsernames = new ArrayList<String>();
         for (String element : properties.getProperty("site.inkbunny.watchedUsernames", "").split(",")) {
@@ -94,17 +94,17 @@ public class AppConfig {
         return inkbunnyUsernames;
     }
 
-    @Bean(name="inkbunnyUsername")
+    @Bean(name = "inkbunnyUsername")
     String inkbunnyUsername(@Qualifier("checkerProperties") Properties properties) {
-        return properties.getProperty("site.inkbunny.username","");
+        return properties.getProperty("site.inkbunny.username", "");
     }
 
-    @Bean(name="inkbunnyPassword")
+    @Bean(name = "inkbunnyPassword")
     String inkbunnyPassword(@Qualifier("checkerProperties") Properties properties) {
-        return properties.getProperty("site.inkbunny.password","");
+        return properties.getProperty("site.inkbunny.password", "");
     }
 
-    @Bean(name="weasylUserList")
+    @Bean(name = "weasylUserList")
     List<String> weasylUserList(@Qualifier("checkerProperties") Properties properties) {
         ArrayList<String> weasylUsernames = new ArrayList<String>();
         for (String element : properties.getProperty("site.weasyl.watchedUsernames", "").split(",")) {
@@ -113,9 +113,40 @@ public class AppConfig {
         return weasylUsernames;
     }
 
-    @Bean(name = "emptyStringToStringMap")
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    Map<String, String> cookies() {
-        return new HashMap<String, String>();
+    @Bean
+    TrayIcon startingTrayIcon(@Qualifier("runningImage") Image workingImage) {
+        return new TrayIcon(workingImage);
     }
+
+    @Bean(name = "runningImage")
+    Image workingImage() throws IOException {
+        if (SystemTray.isSupported()) {
+            return getScaledImage(getClass().getResource("/running.png"), systemTrayIconWidth());
+        } else {
+            log.info("System tray not supported on this system, I am not displaying a system icon. You'll need to kill this process manually to end it.");
+            return null;
+        }
+    }
+
+    @Bean(name = "sleepingImage")
+    Image idleImage() throws IOException {
+        if (SystemTray.isSupported()) {
+            return getScaledImage(getClass().getResource("/sleeping.png"), systemTrayIconWidth());
+        } else {
+            log.info("System tray not supported on this system, I am not displaying a system icon. You'll need to kill this process manually to end it.");
+            return null;
+        }
+    }
+
+    private int systemTrayIconWidth() throws IOException {
+        if (systemTrayIconWidth == -1) {
+            systemTrayIconWidth = new TrayIcon(ImageIO.read(getClass().getResource("/running.png"))).getSize().width;
+        }
+        return systemTrayIconWidth;
+    }
+
+    private Image getScaledImage(URL image_location, int width) throws IOException {
+        return ImageIO.read(image_location).getScaledInstance(width, -1, Image.SCALE_SMOOTH);
+    }
+
 }

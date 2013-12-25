@@ -12,12 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by IntelliJ IDEA.
- * User: xaoc
- * Date: 30.11.11
- * Time: 17:23
- */
 @Component
 public class Runner {
 
@@ -63,5 +57,4 @@ public class Runner {
             element.stateChange(newState);
         }
     }
-
 }

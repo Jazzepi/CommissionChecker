@@ -1,71 +1,91 @@
-//package CommissionChecker;
-//
-//import org.apache.commons.logging.Log;
-//import org.jsoup.Connection;
-//import org.jsoup.nodes.Element;
-//import org.jsoup.select.Elements;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.mockito.Answers;
-//import org.mockito.Mock;
-//import org.mockito.runners.MockitoJUnitRunner;
-//
-//import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import static org.junit.Assert.assertEquals;
-//import static org.mockito.Mockito.*;
-//
-//@RunWith(MockitoJUnitRunner.class)
-//public class CheckerTest {
-//    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-//    JSoupWrapper jSoupWrapperMock;
-//    @Mock
-//    Elements elementsMock;
-//    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-//    Element elementMock;
-//    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-//    Element elementMock2;
-//    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-//    Element elementMock3;
-//    @Mock
-//    Log loggerMock;
-//
-//    @Test
-//    public void checker_filters_results() throws IOException {
-//        //We are always logged in
-//        when(jSoupWrapperMock.connect("https://www.furaffinity.net/login/?ref=http://www.furaffinity.net/")
-//                .cookies(anyMapOf(String.class, String.class))
-//                .timeout(anyInt())
-//                .method(Connection.Method.POST)
-//                .execute().parse().select("#my-username").isEmpty()).thenReturn(false);
-//
-//        //Return fake data used for the journal
-//        when(jSoupWrapperMock.connect("http://www.furaffinity.net/msg/others/")
-//                .cookies(anyMapOf(String.class, String.class))
-//                .timeout(anyInt())
-//                .get()
-//                .select("#messages-journals .message-stream li:not(.section-controls)")).thenReturn(elementsMock);
-//        when(elementsMock.size()).thenReturn(1);
-//        when(elementsMock.iterator()).thenReturn(new ArrayList<Element>() {{
-//            add(elementMock);
-//            add(elementMock2);
-//            add(elementMock3);
-//        }}.iterator());
-//        when(elementMock.childNode(4).childNode(0).toString()).thenReturn("tehsean");
-//        when(elementMock.childNode(2).childNode(0).toString()).thenReturn("mock journal entry with keyword commission in it");
-//        when(elementMock2.childNode(4).childNode(0).toString()).thenReturn("mock name not on the list");
-//        when(elementMock2.childNode(2).childNode(0).toString()).thenReturn("mock journal entry with keyword commission in it");
-//        when(elementMock3.childNode(4).childNode(0).toString()).thenReturn("tehsean");
-//        when(elementMock3.childNode(2).childNode(0).toString()).thenReturn("mock journal entry without keyword in it");
-//        Checker checkerLegacy = new Checker();
-//
-//        List<Checker.JournalEntry> result = checkerLegacy.checkFA();
-//
-//        assertEquals(1, result.size());
-//        assertEquals("tehsean", result.get(0).getUsername());
-//        assertEquals("mock journal entry with keyword commission in it", result.get(0).getJournalName());
-//    }
-//
-//}
+package CommissionChecker;
+
+import org.apache.commons.logging.Log;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
+public class CheckerTest {
+
+    @Mock
+    Furaffinity furaffinityMock;
+    @Mock
+    Log logMock;
+
+    @Test
+    public void checker_logs_in_when_site_is_not_logged_in() throws IOException {
+        Checker checker = new Checker();
+        ReflectionTestUtils.setField(checker, "log", logMock);
+        when(furaffinityMock.isLoggedIn()).thenReturn(false);
+
+        List<JournalEntry> result = checker.check(furaffinityMock);
+
+        verify(furaffinityMock).login();
+    }
+
+    @Test
+    public void checker_does_not_log_in_when_site_is_already_logged_in() throws IOException {
+        Checker checker = new Checker();
+        ReflectionTestUtils.setField(checker, "log", logMock);
+        when(furaffinityMock.isLoggedIn()).thenReturn(true);
+
+        List<JournalEntry> result = checker.check(furaffinityMock);
+
+        verify(furaffinityMock, never()).login();
+    }
+
+    @Test
+    public void checker_filters_journals_without_watched_users() throws IOException {
+        Checker checker = new Checker();
+        ReflectionTestUtils.setField(checker, "log", logMock);
+        ReflectionTestUtils.setField(checker, "commissionKeywords", new ArrayList<String>(Arrays.asList("keyword1","keyword2", "keyword3")));
+        JournalEntry journalEntry = new JournalEntry("user2", "keyword2");
+        when(furaffinityMock.fetchJournalEntries()).thenReturn(new ArrayList<JournalEntry>(Arrays.asList(journalEntry)));
+        when(furaffinityMock.isWatchedUser("user2")).thenReturn(false);
+
+        List<JournalEntry> result = checker.check(furaffinityMock);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void checker_filters_journals_without_watched_keywords() throws IOException {
+        Checker checker = new Checker();
+        ReflectionTestUtils.setField(checker, "log", logMock);
+        ReflectionTestUtils.setField(checker, "commissionKeywords", new ArrayList<String>(Arrays.asList("keyword1","keyword2", "keyword3")));
+        JournalEntry journalEntry = new JournalEntry("user2", "key");
+        when(furaffinityMock.fetchJournalEntries()).thenReturn(new ArrayList<JournalEntry>(Arrays.asList(journalEntry)));
+        when(furaffinityMock.isWatchedUser("user2")).thenReturn(true);
+
+        List<JournalEntry> result = checker.check(furaffinityMock);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void checker_filters_journals_that_have_already_been_reported() throws IOException {
+        Checker checker = new Checker();
+        ReflectionTestUtils.setField(checker, "log", logMock);
+        ReflectionTestUtils.setField(checker, "commissionKeywords", new ArrayList<String>(Arrays.asList("keyword1","keyword2","keyword3")));
+        JournalEntry journalEntry1 = new JournalEntry("user2", "keyword1 is ready!");
+        JournalEntry journalEntry2 = new JournalEntry("user2", "keyword1 is ready!");
+        when(furaffinityMock.fetchJournalEntries()).thenReturn(new ArrayList<JournalEntry>(Arrays.asList(journalEntry1, journalEntry2)));
+        when(furaffinityMock.isWatchedUser("user2")).thenReturn(true);
+
+        List<JournalEntry> result = checker.check(furaffinityMock);
+
+        assertEquals(result, new ArrayList<JournalEntry>(Arrays.asList(new JournalEntry("user2", "keyword1 is ready!"))));
+    }
+
+}

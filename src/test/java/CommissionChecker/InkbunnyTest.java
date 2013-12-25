@@ -1,23 +1,86 @@
-//package CommissionChecker;
+package CommissionChecker;
+
+import org.apache.commons.logging.Log;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
+public class InkbunnyTest {
+
+    @Mock
+    Log logMock;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    JSoupWrapper jSoupWrapperMock;
+
+
+    @Test
+    public void is_logged_in_succeeds_if_logged_in_details_are_present() throws IOException, AWTException {
+        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
+        ReflectionTestUtils.setField(inkbunny, "log", logMock);
+        Document documentFake = Document.createShell("fakeUri");
+        documentFake.body().append("<table class=\"loggedin_userdetails\"></div>");
+        when(jSoupWrapperMock.connect("https://inkbunny.net/index.php")
+                .cookies(anyMapOf(String.class, String.class))
+                .timeout(anyInt())
+                .method(any(Connection.Method.class))
+                .execute().parse()).thenReturn(documentFake);
+
+        boolean answer = inkbunny.isLoggedIn();
+
+        assertTrue(answer);
+    }
+
+    @Test
+    public void is_logged_in_fails_if_logged_in_details_are_not_present() throws IOException, AWTException {
+        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
+        ReflectionTestUtils.setField(inkbunny, "log", logMock);
+        Document documentFake = Document.createShell("fakeUri");
+        documentFake.body().append("<table class=\"loggedin_userdetails_missing\"></div>");
+        when(jSoupWrapperMock.connect("https://inkbunny.net/index.php")
+                .cookies(anyMapOf(String.class, String.class))
+                .timeout(anyInt())
+                .method(any(Connection.Method.class))
+                .execute().parse()).thenReturn(documentFake);
+
+        boolean answer = inkbunny.isLoggedIn();
+
+        assertFalse(answer);
+    }
+
+//    @Test TODO implement this
+//    public void ignores_non_journal_notices() throws IOException, AWTException {
+//        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
+//        ReflectionTestUtils.setField(inkbunny, "log", logMock);
+//        Document documentFake = Document.createShell("fakeUri");
+//        documentFake.body().append("<table class=\"loggedin_userdetails_missing\"></div>");
+//        when(jSoupWrapperMock.connect("https://inkbunny.net/index.php")
+//                .cookies(anyMapOf(String.class, String.class))
+//                .timeout(anyInt())
+//                .method(any(Connection.Method.class))
+//                .execute().parse()).thenReturn(documentFake);
 //
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.mockito.runners.MockitoJUnitRunner;
-//import java.io.IOException;
+//        JournalEntry journalEntry = new JournalEntry("user1", "keyword1");
+//        JournalEntry journalEntry = new JournalEntry("user2", "keyword2");
+//        new ArrayList<JournalEntry>(Arrays.asList(journalEntry));
 //
-//import static org.junit.Assert.*;
+//        boolean answer = inkbunny.fetchJournalEntries();
 //
-///**
-// * Created by Whitekitten on 12/21/13.
-// */
-//@RunWith(MockitoJUnitRunner.class)
-//public class InkbunnyTest {
-//    @Test
-//    public void test_login() {
-//        try {
-//            assertFalse(new Inkbunny().isLoggedIn());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//        assertFalse(answer);
 //    }
-//}
+}

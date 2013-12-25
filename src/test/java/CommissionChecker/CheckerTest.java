@@ -29,7 +29,7 @@ public class CheckerTest {
         ReflectionTestUtils.setField(checker, "log", logMock);
         when(furaffinityMock.isLoggedIn()).thenReturn(false);
 
-        List<JournalEntry> result = checker.check(furaffinityMock);
+        checker.check(furaffinityMock);
 
         verify(furaffinityMock).login();
     }
@@ -40,7 +40,7 @@ public class CheckerTest {
         ReflectionTestUtils.setField(checker, "log", logMock);
         when(furaffinityMock.isLoggedIn()).thenReturn(true);
 
-        List<JournalEntry> result = checker.check(furaffinityMock);
+        checker.check(furaffinityMock);
 
         verify(furaffinityMock, never()).login();
     }

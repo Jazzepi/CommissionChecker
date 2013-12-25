@@ -19,19 +19,22 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class Inkbunny extends CommissionWebsite {
 
-    @Autowired
-    private JSoupWrapper jsoup;
-    @Autowired
-    @Qualifier("inkbunnyUsername")
-    private String username;
-    @Autowired
-    @Qualifier("inkbunnyPassword")
-    private String password;
+
+    private final JSoupWrapper jsoup;
+    private final String username;
+    private final String password;
     @Resource(name = "inkbunnyUserList")
     private List<String> watchedUsernames;
     private Map<String, String> cookies = new HashMap<String, String>();
     @Logger
     private Log log;
+
+    @Autowired
+    Inkbunny(JSoupWrapper jsoup, @Qualifier("inkbunnyUsername") String username, @Qualifier("inkbunnyPassword") String password) {
+        this.jsoup = jsoup;
+        this.username = username;
+        this.password = password;
+    }
 
     @Override
     public boolean isLoggedIn() throws IOException {
@@ -40,7 +43,10 @@ public class Inkbunny extends CommissionWebsite {
                 .cookies(cookies)
                 .timeout((int) TimeUnit.SECONDS.toMillis(60))
                 .method(Connection.Method.GET)
-                .execute().parse().select(".loggedin_userdetails").isEmpty();
+                .execute()
+                .parse()
+                .select(".loggedin_userdetails")
+                .isEmpty();
     }
 
     @Override
@@ -76,7 +82,7 @@ public class Inkbunny extends CommissionWebsite {
                 .select("#current_notices_all").get(0);
         ArrayList<JournalEntry> journalEntries = new ArrayList<JournalEntry>();
         for (Element element : all_notices_div.children()) {
-            if(isAJournalNotice(element)) {
+            if (isAJournalNotice(element)) {
                 journalEntries.add(new JournalEntry(element.select("a.widget_userNameSmall").text(), element.select(".up_notice_title").text()));
             }
         }

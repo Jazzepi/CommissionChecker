@@ -27,7 +27,7 @@ Optional
 *Warning*
 -------
 
-* I haven't tested this on any STMP service besides Gmail. You're on your own with Yahoo/Hotmail/etc.
+* I haven't tested this on any SMTP service besides Gmail. You're on your own with Yahoo/Hotmail/etc.
 * You use this program at your own risk.
 * Your password/username will be in clear text on your hard drive. Think about that and understand the security implications before you use this program. You should not run this program on a shared computer that other people might have access to.
 
@@ -53,3 +53,4 @@ To add the capacity for watching a new site for commissions do the following:
 2. Add the appropriate properties in the checker.properties
 3. Add an entry to the activeCommissionWebsites in the AppConfig class
 4. Add three new beans in the AppConfig, one for the username, the password, and the watched user list.
+5. Don't forget to add UT coverage, and implement the CommissionCheckerTest interface for your UT.

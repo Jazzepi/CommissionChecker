@@ -1,8 +1,5 @@
 package CommissionChecker;
 
-/**
-* Created by Whitekitten on 12/21/13.
-*/
 public class JournalEntry {
     private final String username;
     private final String journalName;
@@ -12,11 +9,11 @@ public class JournalEntry {
         this.journalName = journalName;
     }
 
-    public String getUsername() {
+    public String username() {
         return username;
     }
 
-    public String getJournalName() {
+    public String journalName() {
         return journalName;
     }
 

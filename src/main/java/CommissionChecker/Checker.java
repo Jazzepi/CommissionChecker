@@ -20,12 +20,12 @@ public class Checker {
     public ArrayList<JournalEntry> check(CommissionWebsite commissionWebsite) throws IOException {
         ArrayList<JournalEntry> newOfferJournalEntries = new ArrayList<JournalEntry>();
         if(!commissionWebsite.isLoggedIn()) {
-            log.info("Logging in");
+            log.info("Logging in to" + commissionWebsite.name());
             commissionWebsite.login();
         }
         for(JournalEntry element: commissionWebsite.fetchJournalEntries()) {
-            log.info("Checking " + element.getUsername() + "'s journal " +  element.getJournalName() + " for commissions");
-            if(commissionWebsite.isWatchedUser(element.getUsername()) && isCommissionJournalTitle(element.getJournalName().toLowerCase())) {
+            log.info("Checking " + element.username() + "'s journal " +  element.journalName() + " for commissions");
+            if(commissionWebsite.isWatchedUser(element.username()) && isCommissionJournalTitle(element.journalName().toLowerCase())) {
                 if(isAnUnreportedOffer(element)) {
                     log.info("Found new commission offer in this journal" + element);
                     foundCommissionOffers.add(element);

@@ -3,9 +3,6 @@ package CommissionChecker;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by Whitekitten on 12/21/13.
- */
 public abstract class CommissionWebsite {
     public abstract boolean isLoggedIn() throws IOException;
 
@@ -15,7 +12,7 @@ public abstract class CommissionWebsite {
 
     public abstract boolean isWatchedUser(String username);
 
-    public String getName() {
+    public String name() {
         return getClass().getSimpleName();
     }
 }

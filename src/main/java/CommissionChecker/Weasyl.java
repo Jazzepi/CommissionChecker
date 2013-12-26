@@ -1,7 +1,5 @@
 package CommissionChecker;
 
-import CommissionChecker.logger.Logger;
-import org.apache.commons.logging.Log;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -18,19 +16,17 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class Furaffinity extends CommissionWebsite {
+public class Weasyl extends CommissionWebsite{
 
     private final JSoupWrapper jsoup;
     private final String username;
     private final String password;
-    @Resource(name = "furaffinityUserList")
-    private List<String> watchedUsernames;
     private Map<String, String> cookies = new HashMap<String, String>();
-    @Logger
-    private Log log;
+    @Resource(name = "weasylUserList")
+    private List watchedUsernames;
 
     @Autowired
-    Furaffinity(JSoupWrapper jsoup, @Qualifier("furaffinityUsername") String username, @Qualifier("furaffinityPassword") String password) {
+    Weasyl(JSoupWrapper jsoup, @Qualifier("weasylUsername") String username, @Qualifier("weasylPassword") String password) {
         this.jsoup = jsoup;
         this.username = username;
         this.password = password;
@@ -38,46 +34,45 @@ public class Furaffinity extends CommissionWebsite {
 
     @Override
     public boolean isLoggedIn() throws IOException {
-        log.info("Checking to see if I'm logged in to Furaffinity.");
-        return !jsoup.connect("https://www.furaffinity.net/login/?ref=http://www.furaffinity.net/")
+        return !jsoup.connect("https://www.weasyl.com/")
                 .cookies(cookies)
                 .timeout((int) TimeUnit.SECONDS.toMillis(60))
                 .get()
-                .select("#my-username")
+                .select("#header-user")
                 .isEmpty();
     }
 
     @Override
     public void login() throws IOException {
-        cookies = jsoup.connect("https://www.furaffinity.net/login/?ref=http://www.furaffinity.net/")
+        cookies = jsoup.connect("https://www.weasyl.com/signin")
                 .timeout((int) TimeUnit.SECONDS.toMillis(60))
-                .data("retard_protection", "1")
-                .data("name", username)
-                .data("pass", password)
-                .data("login", "Login to FurAffinity")
-                .data("action", "login")
+                .data("username", username)
+                .data("password", password)
+                .header("Host", "www.weasyl.com")
+                .header("Origin", "https://www.weasyl.com")
+                .header("Referer", "https://www.weasyl.com/signin")
                 .method(Connection.Method.POST)
-                .execute()
-                .cookies();
+                .execute().cookies();
     }
 
     @Override
     public List<JournalEntry> fetchJournalEntries() throws IOException {
-        Elements elements = jsoup.connect("http://www.furaffinity.net/msg/others/")
+        Elements elements = jsoup.connect("https://www.weasyl.com/messages/notifications")
                 .cookies(cookies)
                 .timeout((int) TimeUnit.SECONDS.toMillis(60))
                 .get()
-                .select("#messages-journals .message-stream li:not(.section-controls)");
+                .select("h3:containsOwn(Journals) + div.group div.item");
+
         ArrayList<JournalEntry> journalEntries = new ArrayList<JournalEntry>(elements.size());
         for (Element element : elements) {
-            journalEntries.add(new JournalEntry(element.childNode(4).childNode(0).toString(), element.childNode(2).childNode(0).toString()));
+            journalEntries.add(new JournalEntry(element.select("a.username").text(), element.select("a.username ~ a").text()));
         }
         return journalEntries;
+
     }
 
     @Override
     public boolean isWatchedUser(String username) {
         return watchedUsernames.contains(username.toLowerCase());
     }
-
 }

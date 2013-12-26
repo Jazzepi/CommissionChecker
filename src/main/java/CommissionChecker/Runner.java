@@ -34,7 +34,7 @@ public class Runner {
             for (CommissionWebsite website : commissionWebsites) {
                 try {
                     for (JournalEntry element : checker.check(website)) {
-                        String emailBody = element.getUsername() + " has posted this journal " + element.getJournalName() + " on website " + website.getName() + "\n";
+                        String emailBody = element.username() + " has posted this journal " + element.journalName() + " on website " + website.name() + "\n";
                         emailer.sendEmail(emailBody);
                     }
                 } catch (Exception e) {

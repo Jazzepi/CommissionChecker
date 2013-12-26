@@ -2,7 +2,6 @@ package CommissionChecker;
 
 import org.apache.commons.logging.Log;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,15 +12,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InkbunnyTest {
+public class InkbunnyTest implements CommissionWebsiteTest{
 
     @Mock
     Log logMock;
@@ -29,6 +25,7 @@ public class InkbunnyTest {
     JSoupWrapper jSoupWrapperMock;
 
 
+    @Override
     @Test
     public void is_logged_in_succeeds_if_logged_in_details_are_present() throws IOException, AWTException {
         Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
@@ -46,6 +43,7 @@ public class InkbunnyTest {
         assertTrue(answer);
     }
 
+    @Override
     @Test
     public void is_logged_in_fails_if_logged_in_details_are_not_present() throws IOException, AWTException {
         Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
@@ -63,9 +61,11 @@ public class InkbunnyTest {
         assertFalse(answer);
     }
 
-//    @Test
-//    public void returns_all_journals() throws IOException, AWTException {
-//        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
+    @Override
+    @Test
+    public void returns_all_journals() throws IOException, AWTException {
+        //TODO implement this
+        //        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
 //        ReflectionTestUtils.setField(inkbunny, "log", logMock);
 //        Document documentFake = Document.createShell("fakeUri");
 //        documentFake.body().append("<table class=\"loggedin_userdetails_missing\"></div>");
@@ -82,5 +82,5 @@ public class InkbunnyTest {
 //        boolean answer = inkbunny.fetchJournalEntries();
 //
 //        assertFalse(answer);
-//    }
+    }
 }

@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FuraffinityTest {
+public class FuraffinityTest implements CommissionWebsiteTest {
 
     @Mock
     Log logMock;
@@ -30,40 +29,41 @@ public class FuraffinityTest {
     JSoupWrapper jSoupWrapperMock;
 
 
+    @Override
     @Test
     public void is_logged_in_succeeds_if_logged_in_details_are_present() throws IOException, AWTException {
         Furaffinity furaffinity = new Furaffinity(jSoupWrapperMock, "AUserName", "password");
         ReflectionTestUtils.setField(furaffinity, "log", logMock);
         Document documentFake = Document.createShell("fakeUri");
-        documentFake.body().append("<li><a id=\"my-username\" href=\"/user/whitekitten/\">~WhiteKitten</a></li>");
+        documentFake.body().append("<li><a id=\"my-username\" href=\"/user/userName/\">~userName</a></li>");
         when(jSoupWrapperMock.connect(anyString())
                 .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
-                .method(any(Connection.Method.class))
-                .execute().parse()).thenReturn(documentFake);
+                .get()).thenReturn(documentFake);
 
         boolean answer = furaffinity.isLoggedIn();
 
         assertTrue(answer);
     }
 
+    @Override
     @Test
     public void is_logged_in_fails_if_logged_in_details_are_not_present() throws IOException, AWTException {
         Furaffinity furaffinity = new Furaffinity(jSoupWrapperMock, "AUserName", "password");
         ReflectionTestUtils.setField(furaffinity, "log", logMock);
         Document documentFake = Document.createShell("fakeUri");
-        documentFake.body().append("<li><a id=\"my-username-id-is-missing\" href=\"/user/whitekitten/\">~WhiteKitten</a></li>");
+        documentFake.body().append("<li><a id=\"my-username-id-is-missing\" href=\"/user/userName/\">~userName</a></li>");
         when(jSoupWrapperMock.connect(anyString())
                 .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
-                .method(any(Connection.Method.class))
-                .execute().parse()).thenReturn(documentFake);
+                .get()).thenReturn(documentFake);
 
         boolean answer = furaffinity.isLoggedIn();
 
         assertFalse(answer);
     }
 
+    @Override
     @Test
     public void returns_all_journals() throws IOException, AWTException {
         Furaffinity furaffinity = new Furaffinity(jSoupWrapperMock, "AUserName", "password");

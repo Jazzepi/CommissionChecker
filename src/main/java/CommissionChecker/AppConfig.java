@@ -39,13 +39,16 @@ public class AppConfig {
     }
 
     @Bean(name = "activeCommissionWebsites")
-    List<CommissionWebsite> activeCommissionWebsites(@Qualifier("checkerProperties") Properties properties, Inkbunny inkbunny, Furaffinity furaffinity) {
+    List<CommissionWebsite> activeCommissionWebsites(@Qualifier("checkerProperties") Properties properties, Inkbunny inkbunny, Furaffinity furaffinity, Weasyl weasyl) {
         ArrayList<CommissionWebsite> commissionWebsites = new ArrayList<CommissionWebsite>();
         if (properties.getProperty("site.inkbunny.isActive", "false").equals("true")) {
             commissionWebsites.add(inkbunny);
         }
         if (properties.getProperty("site.furaffinity.isActive", "false").equals("true")) {
             commissionWebsites.add(furaffinity);
+        }
+        if (properties.getProperty("site.weasyl.isActive", "false").equals("true")) {
+            commissionWebsites.add(weasyl);
         }
         if (commissionWebsites.size() == 0) {
             log.error("No websites are enabled for commission checker. It has no work to do.");
@@ -111,6 +114,16 @@ public class AppConfig {
             weasylUsernames.add(element);
         }
         return weasylUsernames;
+    }
+
+    @Bean(name = "weasylUsername")
+    String weasylUsername(@Qualifier("checkerProperties") Properties properties) {
+        return properties.getProperty("site.weasyl.username", "");
+    }
+
+    @Bean(name = "weasylPassword")
+    String weasylPassword(@Qualifier("checkerProperties") Properties properties) {
+        return properties.getProperty("site.weasyl.password", "");
     }
 
     @Bean

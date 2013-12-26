@@ -35,7 +35,7 @@ public class InkbunnyTest {
         ReflectionTestUtils.setField(inkbunny, "log", logMock);
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<table class=\"loggedin_userdetails\"></div>");
-        when(jSoupWrapperMock.connect("https://inkbunny.net/index.php")
+        when(jSoupWrapperMock.connect(anyString())
                 .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
                 .method(any(Connection.Method.class))
@@ -52,7 +52,7 @@ public class InkbunnyTest {
         ReflectionTestUtils.setField(inkbunny, "log", logMock);
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<table class=\"loggedin_userdetails_missing\"></div>");
-        when(jSoupWrapperMock.connect("https://inkbunny.net/index.php")
+        when(jSoupWrapperMock.connect(anyString())
                 .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
                 .method(any(Connection.Method.class))
@@ -63,8 +63,8 @@ public class InkbunnyTest {
         assertFalse(answer);
     }
 
-//    @Test TODO implement this
-//    public void ignores_non_journal_notices() throws IOException, AWTException {
+//    @Test
+//    public void returns_all_journals() throws IOException, AWTException {
 //        Inkbunny inkbunny = new Inkbunny(jSoupWrapperMock, "AUserName", "password");
 //        ReflectionTestUtils.setField(inkbunny, "log", logMock);
 //        Document documentFake = Document.createShell("fakeUri");

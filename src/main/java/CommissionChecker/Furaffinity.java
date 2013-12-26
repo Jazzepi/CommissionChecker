@@ -20,19 +20,21 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class Furaffinity extends CommissionWebsite {
 
-    @Autowired
-    private JSoupWrapper jsoup;
-    @Autowired
-    @Qualifier("furaffinityUsername")
-    private String username;
-    @Autowired
-    @Qualifier("furaffinityPassword")
-    private String password;
+    private final JSoupWrapper jsoup;
+    private final String username;
+    private final String password;
     @Resource(name = "furaffinityUserList")
     private List<String> watchedUsernames;
     private Map<String, String> cookies = new HashMap<String, String>();
     @Logger
     private Log log;
+
+    @Autowired
+    Furaffinity(JSoupWrapper jsoup, @Qualifier("furaffinityUsername") String username, @Qualifier("furaffinityPassword") String password) {
+        this.jsoup = jsoup;
+        this.username = username;
+        this.password = password;
+    }
 
     @Override
     public boolean isLoggedIn() throws IOException {
@@ -41,7 +43,10 @@ public class Furaffinity extends CommissionWebsite {
                 .cookies(cookies)
                 .timeout((int) TimeUnit.SECONDS.toMillis(60))
                 .method(Connection.Method.POST)
-                .execute().parse().select("#my-username").isEmpty();
+                .execute()
+                .parse()
+                .select("#my-username")
+                .isEmpty();
     }
 
     @Override

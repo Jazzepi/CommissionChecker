@@ -121,9 +121,9 @@ public class AppConfig {
         return properties.getProperty("site.weasyl.username", "");
     }
 
-    @Bean(name = "weasylPassword")
+    @Bean(name = "weasylApiKey")
     String weasylPassword(@Qualifier("checkerProperties") Properties properties) {
-        return properties.getProperty("site.weasyl.password", "");
+        return properties.getProperty("site.weasyl.apiKey", "");
     }
 
     @Bean

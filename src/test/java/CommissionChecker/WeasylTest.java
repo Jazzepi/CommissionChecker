@@ -33,10 +33,9 @@ public class WeasylTest implements CommissionWebsiteTest {
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<div id=\"header-user\"></div>");
         when(jSoupWrapperMock.connect(anyString())
-                .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
-                .method(any(Connection.Method.class))
-                .execute().parse()).thenReturn(documentFake);
+                .header(anyString(), anyString())
+                .get()).thenReturn(documentFake);
 
         boolean answer = weasyl.isLoggedIn();
 
@@ -50,8 +49,8 @@ public class WeasylTest implements CommissionWebsiteTest {
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<div id=\"header-user-missing\"></div>");
         when(jSoupWrapperMock.connect(anyString())
-                .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
+                .header(anyString(), anyString())
                 .get()).thenReturn(documentFake);
 
         boolean answer = weasyl.isLoggedIn();
@@ -79,8 +78,8 @@ public class WeasylTest implements CommissionWebsiteTest {
                 "</div>" +
                 "</div>");
         when(jSoupWrapperMock.connect(anyString())
-                .cookies(anyMapOf(String.class, String.class))
                 .timeout(anyInt())
+                .header(anyString(), anyString())
                 .get()).thenReturn(documentFake);
         JournalEntry journalEntry1 = new JournalEntry("User1", "Christmas roulette tonight");
         JournalEntry journalEntry2 = new JournalEntry("User2", "Christmas roulette tonight2");

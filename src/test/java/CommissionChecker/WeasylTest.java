@@ -29,7 +29,7 @@ public class WeasylTest implements CommissionWebsiteTest {
     @Test
     @Override
     public void is_logged_in_succeeds_if_logged_in_details_are_present() throws IOException, AWTException {
-        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "AUserName", "password");
+        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "apikey");
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<div id=\"header-user\"></div>");
         when(jSoupWrapperMock.connect(anyString())
@@ -45,7 +45,7 @@ public class WeasylTest implements CommissionWebsiteTest {
     @Test
     @Override
     public void is_logged_in_fails_if_logged_in_details_are_not_present() throws IOException, AWTException {
-        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "AUserName", "password");
+        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "apikey");
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<div id=\"header-user-missing\"></div>");
         when(jSoupWrapperMock.connect(anyString())
@@ -61,7 +61,7 @@ public class WeasylTest implements CommissionWebsiteTest {
     @Test
     @Override
     public void returns_all_journals() throws IOException, AWTException {
-        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "AUserName", "password");
+        Weasyl weasyl = new Weasyl(jSoupWrapperMock, "apikey");
         Document documentFake = Document.createShell("fakeUri");
         documentFake.body().append("<div id=\"messages-checkboxes\">" +
                 "<h3>Journals</h3>" +

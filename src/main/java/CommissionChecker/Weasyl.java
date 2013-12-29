@@ -16,15 +16,13 @@ import java.util.concurrent.TimeUnit;
 public class Weasyl extends CommissionWebsite{
 
     private final JSoupWrapper jsoup;
-    private final String username;
     private final String apiKey;
     @Resource(name = "weasylUserList")
     private List watchedUsernames;
 
     @Autowired
-    Weasyl(JSoupWrapper jsoup, @Qualifier("weasylUsername") String username, @Qualifier("weasylApiKey") String apiKey) {
+    Weasyl(JSoupWrapper jsoup, @Qualifier("weasylApiKey") String apiKey) {
         this.jsoup = jsoup;
-        this.username = username;
         this.apiKey = apiKey;
     }
 

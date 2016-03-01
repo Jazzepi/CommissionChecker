@@ -1,0 +1,85 @@
+plugins {
+    id 'edu.sc.seis.launch4j' version '1.6.1'
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven {
+        url 'http://repository.springsource.com/maven/bundles/external'
+    }
+}
+
+version = '1.2-SNAPSHOT'
+
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = JavaVersion.VERSION_1_8
+//noinspection GroovyUnusedAssignment
+targetCompatibility = JavaVersion.VERSION_1_8
+
+configurations.all {
+    exclude group: 'commons-logging'
+    exclude group: 'log4j'
+    exclude group: 'org.slf4j', module:'slf4j-simple'
+}
+
+dependencies {
+    def springVersion = '4.2.5.RELEASE'
+    def powermockVersion = '1.6.4'
+    def loggingVersion = '1.7.18'
+
+    compile 'com.machinepublishers:jbrowserdriver:0.10.1'
+    compile "org.projectlombok:lombok:1.16.6"
+    compile 'javax.mail:mail:1.4'
+    compile 'org.jsoup:jsoup:1.7.2'
+    compile 'cglib:cglib:2.2.2'
+    compile "org.springframework:spring-context:$springVersion"
+    compile "org.slf4j:slf4j-api:$loggingVersion"
+    compile "org.slf4j:jcl-over-slf4j:$loggingVersion"
+    compile "org.slf4j:jul-to-slf4j:$loggingVersion"
+
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+
+    testCompile 'org.assertj:assertj-core:3.3.0'
+    testCompile "org.springframework:spring-test:$springVersion"
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile "org.powermock:powermock-module-junit4:$powermockVersion"
+    testCompile "org.powermock:powermock-api-mockito:$powermockVersion"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "org.mpinnegar.commissionChecker.Main"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+task copyResources(type: Copy) {
+    from 'src/main/wrapper-resources/'
+    into 'build/launch4j'
+}
+
+launch4j {
+    mainClassName = 'org.mpinnegar.commissionChecker.Main'
+    icon = 'favicon.ico'
+    headerType = 'gui'
+    errTitle = 'Commission Checker'
+    stayAlive = true
+    splashWaitForWindows = false
+    splashFileName = "splash-screen.bmp"
+    splashTimeout = 4
+    splashTimeoutError = false
+    initialHeapSize = 20
+    maxHeapSize = 20
+}
+
+afterEvaluate {
+    copyL4jLib.dependsOn copyResources
+}

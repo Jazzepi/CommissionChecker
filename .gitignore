@@ -3,5 +3,7 @@
 *.iws
 *.log
 log/
-target/
+build/
+.gradle/
 dev.properties
+

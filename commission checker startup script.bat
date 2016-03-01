@@ -1,1 +1,0 @@
-start javaw -jar -Xmx12M -XX:NewSize=1M C:\path\to\commission-checker.jar
